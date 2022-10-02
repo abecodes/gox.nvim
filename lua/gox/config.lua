@@ -8,6 +8,12 @@ local defaults = {
 		enabled = true,
 		config = "", -- empty string for default $HOME/revive.toml, else path to config
 	},
+	gocritic = {
+		enabled = true,
+	},
+	gosec = {
+		enabled = true,
+	},
 }
 
 --- @type GoxOptions
@@ -19,4 +25,3 @@ M.setup = function(opts)
 end
 
 return M
-

@@ -3,6 +3,7 @@ local utils = require('gox.utils')
 local config = require('gox.config')
 local revive = require('integrations.revive')
 local gocritic = require('integrations.gocritic')
+local gosec = require('integrations.gosec')
 
 ---@class Gox
 local M = {}
@@ -58,6 +59,18 @@ M.setup = function(opts)
 					on_stderr = gocritic.handle_stderr
 				}
 			)
+
+			local gosec_cmd = gosec.cmd()
+			table.insert(gosec_cmd, utils.get_filedir())
+			utils.run(
+				gosec_cmd,
+				{
+					stdout_buffered = true,
+					on_stdout = function(_, data)
+						gosec.handle_stdout(data, utils.get_filepath())
+					end
+				}
+			)
 		end
 	})
 
@@ -88,6 +101,24 @@ M.setup = function(opts)
 				{
 					stderr_buffered = true,
 					on_stderr = gocritic.handle_stderr,
+				}
+			)
+		end,
+		{}
+	)
+
+	utils.new_cmd(
+		'GOXsec',
+		function()
+			local gosec_cmd = gosec.cmd()
+			table.insert(gosec_cmd, utils.get_filedir())
+			utils.run(
+				gosec_cmd,
+				{
+					stdout_buffered = true,
+					on_stdout = function(_, data)
+						gosec.handle_stdout(data, utils.get_filepath())
+					end
 				}
 			)
 		end,
