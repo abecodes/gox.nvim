@@ -1,4 +1,5 @@
 local utils = require('gox.utils')
+local config = require('gox.config')
 
 ---@class Gosec
 local M = {}
@@ -107,7 +108,7 @@ M.handle_stdout = function(data, filepath)
 		::issue_continue::
 	end
 
-	if decoded["Golang errors"][filepath] ~= nil then
+	if config.opts.gosec.show_errors == true and decoded["Golang errors"][filepath] ~= nil then
 		for _, err in ipairs(decoded["Golang errors"][filepath]) do
 			local msg = {
 				bufnr = vim.api.nvim_get_current_buf(),

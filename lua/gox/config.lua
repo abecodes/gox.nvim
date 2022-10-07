@@ -13,6 +13,7 @@ local defaults = {
 	},
 	gosec = {
 		enabled = true,
+		show_errors = false,
 	},
 }
 
