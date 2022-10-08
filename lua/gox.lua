@@ -29,6 +29,8 @@ M.setup = function(opts)
 		pattern = "*.go",
 		callback = function()
 			vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), revive.namespace, 0, -1)
+			vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), gocritic.namespace, 0, -1)
+			vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), gosec.namespace, 0, -1)
 
 			local revive_cmd = revive.cmd()
 			table.insert(revive_cmd, utils.get_filepath())

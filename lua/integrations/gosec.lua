@@ -28,6 +28,10 @@ M.handle_stdout = function(data, filepath)
 		str = str .. line
 	end
 
+	if utils.str_is_empty(str) then
+		return
+	end
+
 	--[[
 		{
 	"Golang errors": {

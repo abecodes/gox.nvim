@@ -34,12 +34,11 @@ Column":2}},"Confidence":1,"ReplacementLine":""}]
 	local out = {}
 
 	for _, line in ipairs(data) do
-		if line == nil or line == "" then
+		if line == nil or line == '' or line == 'null' then
 			goto continue
 		end
-		-- local decoded = vim.fn.json_decode(line)
-		local decoded = vim.json.decode(line)
 
+		local decoded = vim.json.decode(line)
 		for _, result in ipairs(decoded) do
 			local msg = {
 				bufnr = vim.api.nvim_get_current_buf(),
