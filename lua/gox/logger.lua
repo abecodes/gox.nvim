@@ -15,5 +15,34 @@ M.warn = function(msg) M.log(msg, 'WarningMsg') end
 --- @param msg string
 M.debug = function(msg) if config.debug then M.log(msg, 'Todo') end end
 
-return M
+M.dump = function(o)
+	if type(o) == 'table' then
+		local s = '{ '
+		for k,v in pairs(o) do
+			s = s .. '\n['..k..'] = ' .. M.dump(v) .. ',\n'
+		end
+		return s .. '} '
+	end
 
+	if type(o) == 'boolean' then
+		bool_to_string={ [true]='true', [false]='false' }
+		return bool_to_string[o]
+	end
+
+	if type(o) == 'number' then
+		return o
+	end
+
+	if type(o) == 'function' then
+		return 'function'
+	end
+
+    if type(o) == 'string' then
+		return '"'..o..'"'
+	end
+
+    print('unhandled type '.. type(o))
+	return ''
+end
+
+return M

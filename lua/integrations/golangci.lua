@@ -1,22 +1,23 @@
 local config = require('gox.config')
 local utils = require('gox.utils')
 
----@class Revive
+---@class Golangci
 local M = {}
 
-M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.revive')
+M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.golangci')
 
 M.cmd = function(filepath)
 	local cmd = {
-		'revive',
-		'-formatter',
+		'golangci-lint',
+		'run',
+		'--out-format',
 		'json',
 		filepath,
 	}
 
-	if config.opts.revive.config then
-		table.insert(cmd, "-config")
-		table.insert(cmd, vim.fn.expand(config.opts.revive.config))
+	if config.opts.golangci.config then
+		table.insert(cmd, "-c")
+		table.insert(cmd, vim.fn.expand(config.opts.golangci.config))
 	end
 
 	return cmd
@@ -28,10 +29,27 @@ M.handle_stdout = function(_, data)
 	end
 
 	--[[
-		[{"Severity":"warning","Failure":"should have a package comment","RuleName":"package-comments","Category":"comments","P
-osition":{"Start":{"Filename":"XXX","Offset":0,"Line":1,"C
-olumn":1},"End":{"Filename":"XXX","Offset":399,"Line":24,"
-Column":2}},"Confidence":1,"ReplacementLine":""}]
+		{"Issues":
+			[
+				{
+					"FromLinter":"ineffassign",
+					"Text":"ineffectual assignment to ctx",
+					"Severity":"error",
+					"SourceLines":[
+						"\t\tctx, span := c.trc.Tracer(\"\").Start("
+					],
+					"Replacement":null,
+					"Pos":{
+						"Filename":"msg.go",
+						"Offset":4435,
+						"Line":169,
+						"Column":3
+					},
+					"ExpectNoLint":false,
+					"ExpectedNoLintLinter":""
+				}
+			],
+			...
 	--]]
 	local out = {}
 
@@ -41,18 +59,18 @@ Column":2}},"Confidence":1,"ReplacementLine":""}]
 		end
 
 		local decoded = vim.json.decode(line)
-		for _, result in ipairs(decoded) do
+		for _, issue in ipairs(decoded.Issues) do
 			local msg = {
 				bufnr = vim.api.nvim_get_current_buf(),
-				lnum = result.Position.Start.Line - 1,
+				lnum = issue.Pos.Line - 1,
 				col = 0,
 				severity = vim.diagnostic.severity.WARN,
-				source = "revive",
-				message = result.Failure,
+				source = issue.FromLinter,
+				message = issue.Text,
 				user_data = {},
 			}
 
-			if result.Severity == "error" then
+			if issue.Severity == "error" then
 				msg.severity = vim.diagnostic.severity.ERROR
 			end
 

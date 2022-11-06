@@ -6,12 +6,13 @@ local M = {}
 
 M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.gosec')
 
-M.cmd = function()
+M.cmd = function(filedir)
 	local cmd = {
 		'gosec',
 		'-quiet',
 		'-fmt',
-		'json'
+		'json',
+		filedir,
 	}
 
 	return cmd
@@ -129,6 +130,23 @@ M.handle_stdout = function(data, filepath)
 	end
 
 	vim.diagnostic.set(M.namespace, vim.api.nvim_get_current_buf(), out, {})
+end
+
+M.clear_namespace = function()
+	vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), M.namespace, 0, -1)
+end
+
+M.execute = function()
+	M.clear_namespace()
+	utils.run(
+		M.cmd(utils.get_filedir()),
+		{
+			stdout_buffered = true,
+			on_stdout = function(_, data)
+				M.handle_stdout(data, utils.get_filepath())
+			end
+		}
+	)
 end
 
 return M

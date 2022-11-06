@@ -5,11 +5,12 @@ local M = {}
 
 M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.gocritic')
 
-M.cmd = function()
+M.cmd = function(filepath)
 	local cmd = {
 		'gocritic',
 		'check',
-		'-enableAll'
+		'-enableAll',
+		filepath,
 	}
 
 	return cmd
@@ -57,6 +58,21 @@ M.handle_stderr = function(_, data)
 	end
 
 	vim.diagnostic.set(M.namespace, vim.api.nvim_get_current_buf(), out, {})
+end
+
+M.clear_namespace = function()
+	vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), M.namespace, 0, -1)
+end
+
+M.execute = function()
+	M.clear_namespace()
+	utils.run(
+		M.cmd(utils.get_filepath()),
+		{
+			stderr_buffered = true,
+			on_stderr = M.handle_stderr
+		}
+	)
 end
 
 return M
