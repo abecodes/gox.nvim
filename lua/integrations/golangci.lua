@@ -60,8 +60,8 @@ M.handle_stdout = function(_, data, filename)
 
 		local decoded = vim.json.decode(line)
 		for _, issue in ipairs(decoded.Issues) do
-			if not issue.Pos.Filename == filename then
-				goto continue
+			if not (vim.fn.fnamemodify(issue.Pos.Filename, ':t') == filename) then
+				goto continue_issue
 			end
 			local msg = {
 				bufnr = vim.api.nvim_get_current_buf(),
@@ -78,6 +78,7 @@ M.handle_stdout = function(_, data, filename)
 			end
 
 			table.insert(out, msg)
+			::continue_issue::
 		end
 
 		::continue::
