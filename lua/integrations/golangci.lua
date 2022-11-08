@@ -6,13 +6,13 @@ local M = {}
 
 M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.golangci')
 
-M.cmd = function(filepath)
+M.cmd = function(filedir)
 	local cmd = {
 		'golangci-lint',
 		'run',
 		'--out-format',
 		'json',
-		filepath,
+		filedir,
 	}
 
 	if config.opts.golangci.config then
@@ -23,7 +23,7 @@ M.cmd = function(filepath)
 	return cmd
 end
 
-M.handle_stdout = function(_, data)
+M.handle_stdout = function(_, data, filename)
 	if not data then
 		return
 	end
@@ -60,6 +60,9 @@ M.handle_stdout = function(_, data)
 
 		local decoded = vim.json.decode(line)
 		for _, issue in ipairs(decoded.Issues) do
+			if not issue.Pos.Filename == filename then
+				goto continue
+			end
 			local msg = {
 				bufnr = vim.api.nvim_get_current_buf(),
 				lnum = issue.Pos.Line - 1,
@@ -90,10 +93,12 @@ end
 M.execute = function()
 	M.clear_namespace()
 	utils.run(
-		M.cmd(utils.get_filepath()),
+		M.cmd(utils.get_filedir()),
 		{
 			stdout_buffered = true,
-			on_stdout = M.handle_stdout
+			on_stdout = function(_, data)
+				M.handle_stdout(_, data, utils.get_filename())
+			end
 		}
 	)
 end

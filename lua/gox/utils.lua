@@ -53,6 +53,12 @@ M.run = function(cmds, opts)
 	vim.fn.jobstart(cmds, opts)
 end
 
+---get the name to the current file
+---@return string
+M.get_filename = function()
+	return vim.fn.expand("%:t")
+end
+
 ---get the path to the current file
 ---@return string
 M.get_filepath = function()
