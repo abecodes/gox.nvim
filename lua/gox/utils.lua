@@ -68,7 +68,7 @@ end
 ---get the dir to the current file
 ---@return string
 M.get_filedir = function()
-	return vim.fn.expand("%:p:h")
+	return vim.fn.fnamemodify(api.nvim_buf_get_name(0), ':h')
 end
 
 ---check if cursor is at a certain position
