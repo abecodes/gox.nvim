@@ -12,7 +12,7 @@ M.cmd = function(filedir)
 		'run',
 		'--out-format',
 		'json',
-		filedir,
+		filedir..'/'
 	}
 
 	if config.opts.golangci.config then
