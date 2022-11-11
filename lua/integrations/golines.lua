@@ -47,18 +47,27 @@ M.handle_stdout = function(_, data)
 	vim.api.nvim_buf_set_lines(
 		0,
 		0,
-		vim.api.nvim_buf_line_count(0),
-		false,
-		{}
-	)
-	vim.api.nvim_buf_set_lines(
-		0,
-		0,
-		0,
+		-1,
 		false,
 		data
 	)
 	local maxLines = vim.api.nvim_buf_line_count(0)
+
+	if not (vim.fn.getline(maxLines) == '') then
+		vim.fn.append(vim.fn.line('$'), '')
+	else
+		while vim.fn.getline(maxLines) == '' and vim.fn.getline(maxLines - 1) == '' do
+			vim.api.nvim_buf_set_lines(
+				0,
+				-2,
+				-1,
+				false,
+				{}
+			)
+
+			maxLines = vim.api.nvim_buf_line_count(0)
+		end
+	end
 
 	-- old position outside of bounds
 	if maxLines < currPos[1] then
@@ -66,14 +75,15 @@ M.handle_stdout = function(_, data)
 	end
 
 	vim.api.nvim_win_set_cursor(0, currPos)
-end
-
-M.clear_namespace = function()
-	vim.api.nvim_buf_clear_namespace(vim.api.nvim_get_current_buf(), M.namespace, 0, -1)
+	-- this is fishy, no idea rn why I need this
+	vim.api.nvim_command("noautocmd :update")
 end
 
 M.execute = function()
-	M.clear_namespace()
+	if not vim.api.nvim_buf_get_option(0, "modified") then
+		return
+	end
+
 	local jobid = utils.run(
 		M.cmd(),
 		{
