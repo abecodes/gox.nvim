@@ -49,8 +49,9 @@ end
 ---run a new external job
 ---@param cmds string[]
 ---@param opts JobOpts
+---@return number
 M.run = function(cmds, opts)
-	vim.fn.jobstart(cmds, opts)
+	return vim.fn.jobstart(cmds, opts)
 end
 
 ---get the name to the current file

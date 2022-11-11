@@ -5,6 +5,8 @@ local M = {}
 
 M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.gocritic')
 
+M.event = 'BufWritePost'
+
 M.cmd = function(filepath)
 	local cmd = {
 		'gocritic',

@@ -6,6 +6,8 @@ local M = {}
 
 M.namespace = vim.api.nvim_create_namespace('codes.abe.gox.gosec')
 
+M.event = 'BufWritePost'
+
 M.cmd = function(filedir)
 	local cmd = {
 		'gosec',

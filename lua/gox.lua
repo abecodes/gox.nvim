@@ -11,7 +11,7 @@ M.setup = function(opts)
 
 	for k,integration in pairs(config.integrations) do
 		-- setting eventlisteners
-		utils.new_autocmd('BufWritePost', 'codes.abe.gox.'..k, {
+		utils.new_autocmd(integration.event, 'codes.abe.gox.'..k, {
 			pattern = "*.go",
 			callback = function()
 				integration.execute()
